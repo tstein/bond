@@ -16,17 +16,59 @@ namespace UnitTest.Epoxy
     {
         private static readonly IPEndPoint localhostEndpoint = new IPEndPoint(IPAddress.Loopback, 0);
 
+        private class MyCoolHandler : LogHandler
+        {
+            public void Handle(LogSeverity severity, Exception exception, string format, object[] args)
+            {
+                var s = string.Format(format, args);
+                Console.WriteLine("{0}: {1}", severity, s);
+                if (exception != null)
+                {
+                    Console.WriteLine(exception);
+                    Console.WriteLine();
+                }
+            }
+        }
+
         [Test]
         public async Task ListenOnPortZero_ActuallyListensOnSomeOtherPort()
         {
-            EpoxyTransport transport = MakeTransport();
-            var listener = transport.MakeListener(localhostEndpoint);
+            Log.RemoveHandler();
+            try
+            {
+                Log.SetHandler(new MyCoolHandler());
 
-            await listener.StartAsync();
+                Console.WriteLine("HERE A");
 
-            Assert.AreNotEqual(0, listener.ListenEndpoint.Port);
+                EpoxyTransport transport = MakeTransport();
 
-            await listener.StopAsync();
+                Console.WriteLine("HERE B");
+
+                var listener = transport.MakeListener(localhostEndpoint);
+
+                Console.WriteLine("HERE C");
+
+                await listener.StartAsync();
+
+                Console.WriteLine("HERE D");
+
+                Assert.AreNotEqual(0, listener.ListenEndpoint.Port);
+
+                Console.WriteLine("HERE E");
+
+                await listener.StopAsync();
+
+                Console.WriteLine("HERE F");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("CAUGHT: {0}", ex);
+                throw;
+            }
+            finally
+            {
+                Log.RemoveHandler();
+            }
         }
 
         [Test]
