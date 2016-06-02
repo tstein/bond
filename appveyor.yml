@@ -21,22 +21,9 @@
         BOND_TOKEN:
             secure: 30K3L1s8erWFnnS/Iyb2LP7kiGZBr/GzA24Y82mCsGMBjzSUyk7uV7MvZ3NepNvB
         matrix:
-            - BOND_BUILD: Python
-              BOND_VS: "Visual Studio 14 2015"
-              BOND_BOOST: 59
-            - BOND_BUILD: C++
-              BOND_VS: "Visual Studio 14 2015 Win64"
-              BOND_BOOST: 59
             - BOND_BUILD: C#
               BOND_OUTPUT: Properties
               BOND_CONFIG: Debug
-            - BOND_BUILD: Doc
-            - BOND_BUILD: C++
-              BOND_VS: "Visual Studio 12 2013"
-              BOND_BOOST: 55
-            - BOND_BUILD: C#
-              BOND_OUTPUT: Fields
-              BOND_CONFIG: Fields
 
     install:
         - ps: >-
@@ -207,12 +194,6 @@
             }
 
             if ($env:BOND_BUILD -eq "C#") {
-
-                nunit-console-x86 /framework:net-4.0 /labels "cs\test\core\bin\debug\net40\${env:BOND_OUTPUT}\Bond.UnitTest.dll" cs\test\internal\bin\debug\net40\Bond.InternalTest.dll
-                if (-not $?) { throw "tests failed" }
-
-                nunit-console-x86 /framework:net-4.5 /labels "cs\test\core\bin\debug\net45\${env:BOND_OUTPUT}\Bond.UnitTest.dll" cs\test\internal\bin\debug\net45\Bond.InternalTest.dll
-                if (-not $?) { throw "tests failed" }
 
                 nunit-console-x86 /framework:net-4.5 /labels "cs\test\comm\bin\debug\net45\${env:BOND_OUTPUT}\Bond.Comm.UnitTest.dll"
                 if (-not $?) { throw "tests failed" }
