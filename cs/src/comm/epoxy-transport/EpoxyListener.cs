@@ -24,21 +24,16 @@ namespace Bond.Comm.Epoxy
 
         private CancellationTokenSource shutdownTokenSource;
 
+        public IPEndPoint ListenEndpoint { get; private set; }
+
         public EpoxyListener(EpoxyTransport parentTransport, IPEndPoint listenEndpoint)
         {
             this.parentTransport = parentTransport;
-            listener = new System.Net.Sockets.TcpListener(listenEndpoint);
+            listener = new TcpListener(listenEndpoint);
+            ListenEndpoint = null;
             serviceHost = new ServiceHost(parentTransport);
             connections = new HashSet<EpoxyConnection>();
             shutdownTokenSource = new CancellationTokenSource();
-        }
-
-        public IPEndPoint ListenEndpoint
-        {
-            get
-            {
-                return (IPEndPoint)listener.LocalEndpoint;
-            }
         }
 
         public override string ToString()
@@ -65,6 +60,7 @@ namespace Bond.Comm.Epoxy
         public override Task StartAsync()
         {
             listener.Start();
+            ListenEndpoint = (IPEndPoint) listener.LocalEndpoint;
             acceptTask = Task.Run(() => AcceptAsync(shutdownTokenSource.Token), shutdownTokenSource.Token);
             return TaskExt.CompletedTask;
         }
