@@ -36,7 +36,7 @@ namespace UnitTest.Epoxy
             Log.RemoveHandler();
             try
             {
-                Log.SetHandler(new MyCoolHandler());
+                //Log.SetHandler(new MyCoolHandler());
 
                 Console.WriteLine("HERE A");
 
