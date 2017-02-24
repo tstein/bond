@@ -51,6 +51,9 @@ module Language.Bond.Codegen.Templates
     , comm_interface_cs
     , comm_proxy_cs
     , comm_service_cs
+      -- ** Java
+    , JavaFieldMapping(..)
+    , class_java
     )
     where
 
@@ -65,6 +68,7 @@ import Language.Bond.Codegen.Cpp.Comm_cpp
 import Language.Bond.Codegen.Cpp.Comm_h
 import Language.Bond.Codegen.Cs.Types_cs
 import Language.Bond.Codegen.Cs.Comm_cs
+import Language.Bond.Codegen.Java.Class_java
 -- redundant imports for haddock
 import Language.Bond.Codegen.TypeMapping
 import Language.Bond.Syntax.Types
