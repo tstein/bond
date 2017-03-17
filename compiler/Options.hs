@@ -55,7 +55,6 @@ data Options
         { files :: [FilePath]
         , import_dir :: [FilePath]
         , output_dir :: FilePath
-        , using :: [String]
         , namespace :: [String]
         , jobs :: Maybe Int
         , no_banner :: Bool
