@@ -3,13 +3,13 @@ package com.microsoft.bond.protocol;
 import java.math.BigInteger;
 
 public class UnsignedHelper {
-    private final static BigInteger DOUBLE_LONG_MAX;
+    private final static BigInteger TWO_TO_65;
     private final static BigInteger LONG_MAX_PLUS_ONE;
     static {
         BigInteger ulong_max = BigInteger.valueOf(Long.MAX_VALUE);
         ulong_max = ulong_max.add(BigInteger.ONE);
         ulong_max = ulong_max.add(ulong_max);
-        DOUBLE_LONG_MAX = ulong_max;
+        TWO_TO_65 = ulong_max;
 
         BigInteger long_max_plus_one = BigInteger.valueOf(Long.MAX_VALUE);
         long_max_plus_one = long_max_plus_one.add(BigInteger.ONE);
@@ -34,7 +34,7 @@ public class UnsignedHelper {
         } else if (signed == Long.MIN_VALUE) {
             return LONG_MAX_PLUS_ONE;
         } else {
-            return DOUBLE_LONG_MAX.add(BigInteger.valueOf(signed));
+            return TWO_TO_65.add(BigInteger.valueOf(signed));
         }
     }
 }

@@ -116,11 +116,11 @@ writeMap java keyType valueType fieldName depth =
 --
 -- deserialization
 --
-readFieldResultMember :: Text
-readFieldResultMember = [lt|__readFieldResult|]
+readFieldResultMember :: String
+readFieldResultMember = "__readFieldResult"
 
-readContainerResultMember :: Text
-readContainerResultMember = [lt|__readContainerResult|]
+readContainerResultMember :: String
+readContainerResultMember = "__readContainerResult"
 
 deserializationHelperMembers :: Text
 deserializationHelperMembers = [lt|
@@ -144,6 +144,7 @@ deserialize_ProtocolWriter java declaration = [lt|
     }|]
     where
         fields = structFields declaration
+        -- TODO: Check that field id and type are as expected.
         readField field@Field {..} = [lt|
         reader.readFieldBegin(this.#{readFieldResultMember});
         #{readFieldValue java fieldType fieldName 0}
@@ -183,41 +184,48 @@ readValue java fieldType varName depth = case fieldType of
 
 readNullable :: MappingContext -> Type -> String -> Int -> Text
 readNullable java elemType fieldName depth =
-    [lt|reader.readListBegin(#{readContainerResultMember});
-        if (#{readContainerResultMember}.count == 0) {
-            #{readValue java elemType fieldName (depth + 1)}
-        } else {
+    -- TODO: What if .count > 1?
+    [lt|reader.readListBegin(this.#{readContainerResultMember});
+        if (this.#{readContainerResultMember}.count == 0) {
             #{fieldName} = null;
+        } else {
+            #{readValue java elemType fieldName (depth + 1)}
         }
         reader.readContainerEnd();|]
 
 readSequence :: MappingContext -> Type -> String -> Int -> Text
 readSequence java elemType fieldName depth =
-    [lt|reader.readListBegin(#{readContainerResultMember});
-        long count = #{readContainerResultMember}.count;
-        for (int #{iN} = 0; #{iN} < count; #{iN}++) {
-            #{getTypeName java elemType} #{elemLocal};
-            #{readValue java elemType elemLocal (depth + 1)}
-            #{fieldName}.add(#{elemLocal});
+    [lt|reader.readListBegin(this.#{readContainerResultMember});
+        {
+            long #{countLocal} = this.#{readContainerResultMember}.count;
+            for (long #{iN} = 0; #{iN} < #{countLocal}; #{iN}++) {
+                #{getTypeName java elemType} #{elemLocal};
+                #{readValue java elemType elemLocal (depth + 1)}
+                #{fieldName}.add(#{elemLocal});
+            }
         }
         reader.readContainerEnd();|]
     where
         iN = "i" ++ show depth
+        countLocal = "count" ++ show depth
         elemLocal = "e" ++ show depth
 
 readMap :: MappingContext -> Type -> Type -> String -> Int -> Text
 readMap java keyType valueType fieldName depth =
     [lt|reader.readListBegin(#{readContainerResultMember});
-        long count = #{readContainerResultMember}.count;
-        for (int #{iN} = 0; #{iN} < count; #{iN}++) {
-            #{getTypeName java keyType} #{keyLocal};
-            #{getTypeName java valueType} #{valueLocal};
-            #{readValue java keyType keyLocal (depth + 1)}
-            #{readValue java valueType valueLocal (depth + 1)}
-            #{fieldName}.put(#{keyLocal}, #{valueLocal});
+        {
+            long #{countLocal} = #{readContainerResultMember}.count;
+            for (long #{iN} = 0; #{iN} < #{countLocal}; #{iN}++) {
+                #{getTypeName java keyType} #{keyLocal};
+                #{getTypeName java valueType} #{valueLocal};
+                #{readValue java keyType keyLocal (depth + 1)}
+                #{readValue java valueType valueLocal (depth + 1)}
+                #{fieldName}.put(#{keyLocal}, #{valueLocal});
+            }
         }
         reader.readContainerEnd();|]
     where
         iN = "i" ++ show depth
+        countLocal = "count" ++ show depth
         keyLocal = "k" ++ show depth
         valueLocal = "v" ++ show depth

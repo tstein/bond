@@ -8,12 +8,12 @@ import java.math.BigInteger;
  * Reads a serialized payload.
  */
 public interface TaggedProtocolReader {
-    class ReadFieldResult {
+    final class ReadFieldResult {
         public BondDataType type;
         public int id;
     }
 
-    class ReadContainerResult {
+    final class ReadContainerResult {
         public long count;
         public BondDataType element;
         public BondDataType key;
