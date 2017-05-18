@@ -83,17 +83,14 @@ defaultValue java Field {fieldDefault = Nothing, ..} = implicitDefault fieldType
 
 defaultValue java Field {fieldDefault = (Just def), ..} = explicitDefault def
   where
-    explicitDefault (DefaultInteger x) = Just $ intLiteral fieldType x
+    explicitDefault (DefaultInteger x) = Just $ intLiteral x
       where
-        intLiteral BT_Int8 value = [lt|#{value}|]
-        intLiteral BT_Int16 value = [lt|#{value}|]
-        intLiteral BT_Int32 value = [lt|#{value}|]
-        intLiteral BT_Int64 value = [lt|#{value}L|]
-        intLiteral BT_UInt8 value = [lt|#{value}|]
-        intLiteral BT_UInt16 value = [lt|#{value}|]
-        intLiteral BT_UInt32 value = [lt|#{value}|]
-        intLiteral BT_UInt64 value = [lt|#{value}|]
-        intLiteral _ _ = error "Java:Int:defaultValue/floatLiteral: impossible happened."
+        intMax = 2147483647
+        intMin = -2147483648
+        intLiteral value =
+            if value > intMax || value < intMin
+            then [lt|#{value}L|]
+            else [lt|#{value}|]
     explicitDefault (DefaultFloat x) = Just $ floatLiteral fieldType x
       where
         floatLiteral BT_Float y = [lt|#{y}f|]
